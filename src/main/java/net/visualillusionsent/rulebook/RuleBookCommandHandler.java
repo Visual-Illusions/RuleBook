@@ -17,8 +17,10 @@
  */
 package net.visualillusionsent.rulebook;
 
+import static net.visualillusionsent.rulebook.RuleBook.getAdminBook;
 import static net.visualillusionsent.rulebook.RuleBook.getCode;
 import static net.visualillusionsent.rulebook.RuleBook.getModBook;
+import static net.visualillusionsent.rulebook.RuleBook.getPlayerBook;
 import static net.visualillusionsent.rulebook.RuleBook.getPromotionGroup;
 import static net.visualillusionsent.rulebook.RuleBook.getRuleBook;
 import net.canarymod.Canary;
@@ -107,7 +109,7 @@ public class RuleBookCommandHandler implements CommandListener {
         permissions = { "" })
     public final void pBook(MessageReceiver msgrec, String[] args) {
         if (msgrec instanceof Player) {
-            ((Player) msgrec).getInventory().addItem(getModBook());
+            ((Player) msgrec).getInventory().addItem(getPlayerBook());
             msgrec.notice("Here is your new Players Book");
         }
         else {
@@ -122,7 +124,7 @@ public class RuleBookCommandHandler implements CommandListener {
         permissions = { "rulebook.admin" })
     public final void aBook(MessageReceiver msgrec, String[] args) {
         if (msgrec instanceof Player) {
-            ((Player) msgrec).getInventory().addItem(getModBook());
+            ((Player) msgrec).getInventory().addItem(getAdminBook());
             msgrec.notice("Here is your new Players Book");
         }
         else {

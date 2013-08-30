@@ -82,17 +82,20 @@ public class RuleBook extends Plugin {
     }
 
     private final boolean makeBooks() {
-        if (!new File("config/RuleBook/RuleBook.cfg").exists()) {
-            PropertiesFile pluginCfg = new PropertiesFile("config/RuleBook/RuleBookPlugin.cfg");
+        if (!new File("config/RuleBook/RuleBookPlugin.cfg").exists()) {
+            pluginCfg = new PropertiesFile("config/RuleBook/RuleBookPlugin.cfg");
             pluginCfg.addHeaderLines("RuleBook Plugin configuration file");
-            pluginCfg.setBoolean("useLockdownArea", true);
-            pluginCfg.setString("lockdownLocation", "0,0,0");
-            pluginCfg.setInt("lockdownRadius", 50);
-            pluginCfg.setString("promotionGroup", "players");
-            pluginCfg.setString("welcome.message", "&6Welcome to the Server. Please read the given rule book and confirm the rules before proceeding.");
+            pluginCfg.getBoolean("useLockdownArea", true);
+            pluginCfg.getString("lockdownLocation", "0,0,0");
+            pluginCfg.getInt("lockdownRadius", 50);
+            pluginCfg.getString("promotionGroup", "players");
+            pluginCfg.getString("welcome.message", "&6Welcome to the Server. Please read the given rule book and confirm the rules before proceeding.");
             pluginCfg.save();
             getLogman().logWarning("This plugin needs to be configured before use. A new Config has be generated in config/RuleBook/RuleBookPlugin.cfg");
             return false;
+        }
+        else {
+            pluginCfg = new PropertiesFile("config/RuleBook/RuleBookPlugin.cfg");
         }
         createBook("RuleBook", rBook);
         createBook("PlayerBook", pBook);
@@ -109,6 +112,7 @@ public class RuleBook extends Plugin {
             bookcfg.setString("page0", "Front Page");
             bookcfg.setString("page1", "Example Page");
             bookcfg.setString("page2", "Formating Examples &00&11&22&33&44&55&66&77&88&99\n&AA&BB&CC&DD&EE&FF&KK&LL&MM&NN&OO");
+            bookcfg.save();
         }
         int page = 0;
         while (bookcfg.containsKey("page" + page)) {
