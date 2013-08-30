@@ -17,7 +17,6 @@
  */
 package net.visualillusionsent.rulebook;
 
-import static net.canarymod.Canary.factory;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Random;
@@ -33,8 +32,11 @@ import net.visualillusionsent.utils.PropertiesFile;
 
 public class RuleBook extends Plugin {
 
-    private final Item theRuleBook = Canary.factory().getItemFactory().newItem(ItemType.WrittenBook, 0, 1);
-    private PropertiesFile bookcfg;
+    private final Item rBook = Canary.factory().getItemFactory().newItem(ItemType.WrittenBook, 0, 1),
+        pBook = Canary.factory().getItemFactory().newItem(ItemType.WrittenBook, 0, 1),
+        mBook = Canary.factory().getItemFactory().newItem(ItemType.WrittenBook, 0, 1),
+        aBook = Canary.factory().getItemFactory().newItem(ItemType.WrittenBook, 0, 1);
+    private PropertiesFile pluginCfg;
     private Vector3D lockdown_location;
     private static RuleBook $;
     private static HashMap<String, String> codes = new HashMap<String, String>();
@@ -47,7 +49,7 @@ public class RuleBook extends Plugin {
     @Override
     public final boolean enable() {
         try {
-            if (!generateBook()) {
+            if (!makeBooks()) {
                 return false;
             }
             new RuleBookHookHandler(this);
@@ -79,62 +81,86 @@ public class RuleBook extends Plugin {
         return precode.substring(randomStart, randomStart + 6);
     }
 
-    private final boolean generateBook() {
+    private final boolean makeBooks() {
         if (!new File("config/RuleBook/RuleBook.cfg").exists()) {
-            PropertiesFile thebookcfg = new PropertiesFile("config/RuleBook/RuleBook.cfg");
-            thebookcfg.addHeaderLines("RuleBook configuration file", "For pages add page#= (replace # with a number, pages start @ 0)", "use \\n for new lines within pages and & for colors/formatting");
-            thebookcfg.setBoolean("useLockdownArea", true);
-            thebookcfg.setString("lockdownLocation", "0,0,0");
-            thebookcfg.setInt("lockdownRadius", 35);
-            thebookcfg.setString("promotionGroup", "players");
-            thebookcfg.setString("title", "The Rule Book v1.0");
-            thebookcfg.setString("page0", "Opening Page");
-            thebookcfg.setString("page1", "Example Page 1");
-            thebookcfg.save();
-            getLogman().logWarning("This plugin needs to be configured before use. A new Config has be generated in config/RuleBook/RuleBook.cfg");
+            PropertiesFile pluginCfg = new PropertiesFile("config/RuleBook/RuleBookPlugin.cfg");
+            pluginCfg.addHeaderLines("RuleBook Plugin configuration file");
+            pluginCfg.setBoolean("useLockdownArea", true);
+            pluginCfg.setString("lockdownLocation", "0,0,0");
+            pluginCfg.setInt("lockdownRadius", 50);
+            pluginCfg.setString("promotionGroup", "players");
+            pluginCfg.setString("welcome.message", "&6Welcome to the Server. Please read the given rule book and confirm the rules before proceeding.");
+            pluginCfg.save();
+            getLogman().logWarning("This plugin needs to be configured before use. A new Config has be generated in config/RuleBook/RuleBookPlugin.cfg");
             return false;
         }
-        bookcfg = new PropertiesFile("config/RuleBook/RuleBook.cfg");
-        int page = 0;
-        while (bookcfg.containsKey("page" + page)) {
-            BookHelper.addPages(theRuleBook, bookcfg.getString("page" + page).replace("\\n", "\n").replaceAll("(?i)&([0-9A-FK-OR])", "\u00A7$1"));
-            page++;
-        }
-        theRuleBook.getDataTag().put("title", Canary.factory().getNBTFactory().newStringTag("title", bookcfg.getString("title")));
+        createBook("RuleBook", rBook);
+        createBook("PlayerBook", pBook);
+        createBook("ModBook", mBook);
+        createBook("AdminBook", aBook);
         return true;
     }
 
-    public static Group getPromotionGroup() {
-        return Canary.usersAndGroups().getGroup($.bookcfg.getString("promotionGroup"));
+    private final void createBook(String book, Item iBook) {
+        PropertiesFile bookcfg = new PropertiesFile("config/RuleBook/" + book + ".cfg");
+        if (!bookcfg.containsKey("title")) {
+            bookcfg.addHeaderLines("Use \\n for new lines and &[color] for color and formating codes", "You can add more pages by setting keys as page#=Some Text  (replacing # with the next page number)");
+            bookcfg.setString("title", book);
+            bookcfg.setString("page0", "Front Page");
+            bookcfg.setString("page1", "Example Page");
+            bookcfg.setString("page2", "Formating Examples &00&11&22&33&44&55&66&77&88&99\n&AA&BB&CC&DD&EE&FF&KK&LL&MM&NN&OO");
+        }
+        int page = 0;
+        while (bookcfg.containsKey("page" + page)) {
+            BookHelper.addPages(iBook, bookcfg.getString("page" + page).replace("\\n", "\n").replaceAll("(?i)&([0-9A-FK-OR])", "\u00A7$1"));
+            page++;
+        }
+        BookHelper.setTitle(iBook, bookcfg.getString("title"));
     }
 
-    public final static Item getRuleBook() {
-        return $.theRuleBook.clone();
+    final static Group getPromotionGroup() {
+        return Canary.usersAndGroups().getGroup($.pluginCfg.getString("promotionGroup"));
     }
 
-    public final static Item generateBook(Player player, String code) {
-        Item newRuleBook = getRuleBook();
-        // I broke the BookHelper for STRING Tags, this is the work around
-        newRuleBook.getDataTag().put("author", factory().getNBTFactory().newStringTag("author", player.getName()));
-        //BookHelper.setAuthor(newRuleBook, player.getName());
-        BookHelper.addPages(newRuleBook, "Command: /rulebook confirm ".concat(code));
+    final static Item getRuleBook(Player player, String code, boolean generate) {
+        Item newRuleBook = $.rBook.clone();
+        BookHelper.setAuthor(newRuleBook, player.getName());
+        if (generate) {
+            BookHelper.addPages(newRuleBook, "Command:\n/rulebook confirm ".concat(code));
+        }
         return newRuleBook;
+    }
+
+    final static Item getPlayerBook() {
+        return $.pBook.clone();
+    }
+
+    final static Item getModBook() {
+        return $.mBook.clone();
+    }
+
+    final static Item getAdminBook() {
+        return $.aBook.clone();
+    }
+
+    final static String getWelcomeMessage() {
+        return $.pluginCfg.getString("welcome.message").replaceAll("(?i)&([0-9A-FK-OR])", "\u00A7$1");
     }
 
     public final static Vector3D getLockdownLocation() {
         if ($.lockdown_location == null) {
-            int[] coords = $.bookcfg.getIntArray("lockdownLocation");
+            int[] coords = $.pluginCfg.getIntArray("lockdownLocation");
             $.lockdown_location = new Vector3D(coords[0], coords[1], coords[2]);
         }
         return $.lockdown_location;
     }
 
     public final static int getLockdownRadius() {
-        return $.bookcfg.getInt("lockdownRadius");
+        return $.pluginCfg.getInt("lockdownRadius");
     }
 
     public final static boolean useLockdown() {
-        return $.bookcfg.getBoolean("useLockdownArea");
+        return $.pluginCfg.getBoolean("useLockdownArea");
     }
 
     final static void removePlayerCode(Player player) {

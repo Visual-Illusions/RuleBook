@@ -17,9 +17,10 @@
  */
 package net.visualillusionsent.rulebook;
 
-import static net.visualillusionsent.rulebook.RuleBook.generateBook;
 import static net.visualillusionsent.rulebook.RuleBook.getCode;
+import static net.visualillusionsent.rulebook.RuleBook.getModBook;
 import static net.visualillusionsent.rulebook.RuleBook.getPromotionGroup;
+import static net.visualillusionsent.rulebook.RuleBook.getRuleBook;
 import net.canarymod.Canary;
 import net.canarymod.api.entity.living.humanoid.Player;
 import net.canarymod.chat.MessageReceiver;
@@ -45,7 +46,7 @@ public class RuleBookCommandHandler implements CommandListener {
             if (!player.isInGroup(getPromotionGroup(), true)) {
                 code = getCode(player, true); //Generates
             }
-            player.getInventory().addItem(generateBook(player, code));
+            player.getInventory().addItem(getRuleBook(player, code, !code.equals("nocode")));
             msgrec.notice("Here is your new RuleBook");
         }
         else {
@@ -78,6 +79,51 @@ public class RuleBookCommandHandler implements CommandListener {
             else {
                 msgrec.notice("You have no need to re-enter a code, you already have build rights.");
             }
+        }
+        else {
+            msgrec.notice("Rulebook is only for Players");
+        }
+    }
+
+    @Command(aliases = { "modbook" },
+        parent = "rulebook",
+        description = "Gives the Moderators Book for review",
+        toolTip = "/rulebook modbook",
+        permissions = { "rulebook.mod" })
+    public final void modBook(MessageReceiver msgrec, String[] args) {
+        if (msgrec instanceof Player) {
+            ((Player) msgrec).getInventory().addItem(getModBook());
+            msgrec.notice("Here is your new Moderators Book");
+        }
+        else {
+            msgrec.notice("Rulebook is only for Players");
+        }
+    }
+
+    @Command(aliases = { "playerbook", "pbook" },
+        parent = "rulebook",
+        description = "Gives the Players Book for review",
+        toolTip = "/rulebook playerbook",
+        permissions = { "" })
+    public final void pBook(MessageReceiver msgrec, String[] args) {
+        if (msgrec instanceof Player) {
+            ((Player) msgrec).getInventory().addItem(getModBook());
+            msgrec.notice("Here is your new Players Book");
+        }
+        else {
+            msgrec.notice("Rulebook is only for Players");
+        }
+    }
+
+    @Command(aliases = { "adminbook", "abook" },
+        parent = "rulebook",
+        description = "Gives the Admin Book for review",
+        toolTip = "/rulebook adminbook",
+        permissions = { "rulebook.admin" })
+    public final void aBook(MessageReceiver msgrec, String[] args) {
+        if (msgrec instanceof Player) {
+            ((Player) msgrec).getInventory().addItem(getModBook());
+            msgrec.notice("Here is your new Players Book");
         }
         else {
             msgrec.notice("Rulebook is only for Players");

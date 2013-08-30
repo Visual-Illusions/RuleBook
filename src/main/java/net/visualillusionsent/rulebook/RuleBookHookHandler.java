@@ -17,10 +17,11 @@
  */
 package net.visualillusionsent.rulebook;
 
-import static net.visualillusionsent.rulebook.RuleBook.generateBook;
 import static net.visualillusionsent.rulebook.RuleBook.getCode;
 import static net.visualillusionsent.rulebook.RuleBook.getLockdownLocation;
 import static net.visualillusionsent.rulebook.RuleBook.getLockdownRadius;
+import static net.visualillusionsent.rulebook.RuleBook.getRuleBook;
+import static net.visualillusionsent.rulebook.RuleBook.getWelcomeMessage;
 import net.canarymod.Canary;
 import net.canarymod.api.entity.living.humanoid.Player;
 import net.canarymod.api.world.position.Vector3D;
@@ -57,8 +58,8 @@ public final class RuleBookHookHandler implements PluginListener {
     public final void connect(ConnectionHook hook) {
         if (hook.isFirstConnection()) {
             Player player = hook.getPlayer();
-            player.message("\u00A76Welcome to the Server. Please read the given rule book and confirm the rules before proceeding.");
-            player.getInventory().addItem(generateBook(player, getCode(player, true)));
+            player.message(getWelcomeMessage());
+            player.getInventory().addItem(getRuleBook(player, getCode(player, true), true));
         }
     }
 }
