@@ -1,4 +1,21 @@
 /*
+ * This file is part of RuleBooks.
+ *
+ * Copyright © 2013 Visual Illusions Entertainment
+ *
+ * RuleBooks is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * RuleBooks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with RuleBooks.
+ * If not, see http://www.gnu.org/licenses/gpl.html.
+ */
+/*
  * This file is part of RuleBook.
  *
  * Copyright © 2013 Visual Illusions Entertainment
@@ -15,13 +32,8 @@
  * You should have received a copy of the GNU General Public License along with RuleBook.
  * If not, see http://www.gnu.org/licenses/gpl.html.
  */
-package net.visualillusionsent.rulebook;
+package net.visualillusionsent.rulebooks;
 
-import static net.visualillusionsent.rulebook.RuleBook.getCode;
-import static net.visualillusionsent.rulebook.RuleBook.getLockdownLocation;
-import static net.visualillusionsent.rulebook.RuleBook.getLockdownRadius;
-import static net.visualillusionsent.rulebook.RuleBook.getRuleBook;
-import static net.visualillusionsent.rulebook.RuleBook.getWelcomeMessage;
 import net.canarymod.Canary;
 import net.canarymod.api.entity.living.humanoid.Player;
 import net.canarymod.api.world.position.Vector3D;
@@ -30,15 +42,21 @@ import net.canarymod.hook.player.ConnectionHook;
 import net.canarymod.hook.player.PlayerMoveHook;
 import net.canarymod.plugin.PluginListener;
 
-public final class RuleBookHookHandler implements PluginListener {
+import static net.visualillusionsent.rulebooks.RuleBooks.getCode;
+import static net.visualillusionsent.rulebooks.RuleBooks.getLockdownLocation;
+import static net.visualillusionsent.rulebooks.RuleBooks.getLockdownRadius;
+import static net.visualillusionsent.rulebooks.RuleBooks.getRuleBook;
+import static net.visualillusionsent.rulebooks.RuleBooks.getWelcomeMessage;
 
-    public RuleBookHookHandler(RuleBook ruleBook) {
+public final class RuleBooksHookHandler implements PluginListener {
+
+    public RuleBooksHookHandler(RuleBooks ruleBook) {
         Canary.hooks().registerListener(this, ruleBook);
     }
 
     @HookHandler
     public final void lockdown(PlayerMoveHook hook) {
-        if (RuleBook.useLockdown() && !hook.getPlayer().isInGroup(RuleBook.getPromotionGroup(), true)) {
+        if (RuleBooks.useLockdown() && !hook.getPlayer().isInGroup(RuleBooks.getPromotionGroup(), true)) {
             Vector3D lockdown = getLockdownLocation();
             Vector3D v3d = new Vector3D(hook.getTo().getBlockX(), hook.getTo().getBlockY(), hook.getTo().getBlockZ());
             double distance = v3d.getDistance(lockdown);

@@ -1,25 +1,11 @@
-﻿# RuleBook #
-### Rule book giving and build rights giving ###
-#### &copy; Copyright 2013 Visual Illusions Entertainment ####
-#### Licensed under the GNU General Public License v3 ####
-
-## About ##
-- pending -
-
-## Bug Reporting ##
-Please use the [GitHub issue tracker](https://github.com/Visual-Illusions/RuleBook/issues "issues") associated with this repository.<br/>
-Be sure to include as much information about the issue as possible, including Server Mod info
-
-## Compiling ##
-Create a new project in the IDE of your choice<br/>
-Add CanaryLib jars to your build path<br/>
-Export Jar file or use Maven
+﻿# RuleBooks #
+RuleBook/HandBook giving and build rights giving
 
 ## License ##
 
 Copyright &copy; 2013 Visual Illusions Entertainment.
 
-RuleBook is free software: you can redistribute it and/or modify it<br/>
+RuleBooks is free software: you can redistribute it and/or modify it<br/>
 under the terms of the GNU General Public License as published by the Free Software Foundation,<br/>
 either version 3 of the License, or (at your option) any later version.
 

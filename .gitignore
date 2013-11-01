@@ -3,4 +3,5 @@
 /bin
 /.project
 /.classpath
-/buildNumber.properties
+/.idea
+*.iml
