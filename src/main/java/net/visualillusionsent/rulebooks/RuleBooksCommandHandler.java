@@ -47,6 +47,7 @@ import static net.visualillusionsent.rulebooks.RuleBooks.getBook;
 import static net.visualillusionsent.rulebooks.RuleBooks.getCode;
 import static net.visualillusionsent.rulebooks.RuleBooks.getPromotionGroup;
 import static net.visualillusionsent.rulebooks.RuleBooks.getRuleBook;
+import static net.visualillusionsent.rulebooks.RuleBooks.removePlayerCode;
 
 public class RuleBooksCommandHandler extends VisualIllusionsCanaryPluginInformationCommand {
 
@@ -95,6 +96,7 @@ public class RuleBooksCommandHandler extends VisualIllusionsCanaryPluginInformat
             if (!player.isInGroup(getPromotionGroup(), true)) {
                 if (args[1].equals(getCode(player, false))) {
                     player.setGroup(getPromotionGroup());
+                    removePlayerCode(player);
                     msgrec.message(TextFormat.ORANGE + "Thank you for reading and confirming the rules.");
                     msgrec.message(TextFormat.ORANGE + "You have now been granted build rights.");
                     msgrec.message(TextFormat.ORANGE + "Re-logging may be needed for changes to take effect.");

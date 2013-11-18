@@ -58,6 +58,12 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
     private static RuleBooks $;
     private static HashMap<String, String> codes = new HashMap<String, String>();
     private static final Random rnd = new Random();
+    private static final FileFilter bookFilter = new FileFilter() {
+        @Override
+        public boolean accept(File pathName) {
+            return pathName.getName().endsWith(".book");
+        }
+    };
 
     public RuleBooks() {
         $ = this;
@@ -108,27 +114,22 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
             pluginCfg.getString("promotionGroup", "players");
             pluginCfg.getString("welcome.message", "&6Welcome to the Server. Please read the given rule book and confirm the rules before proceeding.");
             pluginCfg.save();
+            scanBooks();
             getLogman().logWarning("This plugin needs to be configured before use. A new Config has be generated in config/RuleBooks/settings.cfg");
             return false;
         }
         else {
             pluginCfg = new PropertiesFile("config/RuleBooks/settings.cfg");
+            scanBooks();
+            return true;
         }
-        scanBooks();
-        return true;
     }
 
     private final void scanBooks() {
         File book_dir = new File("config/RuleBooks/books/");
         if (book_dir.exists()) {
-            FileFilter bookFilter = new FileFilter() {
-                @Override
-                public boolean accept(File pathname) {
-                    return pathname.getName().endsWith(".txt");
-                }
-            };
             for (File book : book_dir.listFiles(bookFilter)) {
-                createBook(book.getName());
+                createBook(book.getName().replace(".book", ""));
             }
         }
         else if (book_dir.mkdir()) {
@@ -140,7 +141,7 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
     }
 
     private final void createBook(String book) {
-        PropertiesFile bookcfg = new PropertiesFile("config/RuleBooks/books/" + book + ".txt");
+        PropertiesFile bookcfg = new PropertiesFile("config/RuleBooks/books/" + book + ".book");
         if (!bookcfg.containsKey("title")) {
             bookcfg.addHeaderLines("Use \\n for new lines and &[color] for color and formatting codes", "You can add more pages by setting keys as page#=Some Text  (replacing # with the next page number)");
             bookcfg.setString("title", book);
@@ -157,8 +158,8 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
             page++;
         }
         BookHelper.setTitle(iBook, bookcfg.getString("title"));
-        iBook.getMetaTag().put("permission", "rulebooks.book.".concat(bookcfg.getString("permission")));
-        books.put(bookcfg.getString("title").toLowerCase(), iBook);
+        iBook.getMetaTag().put("permission", "rulebooks.book.".concat(bookcfg.getString("permission", "")));
+        books.put(book.toLowerCase(), iBook);
     }
 
     static Group getPromotionGroup() {
