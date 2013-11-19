@@ -99,9 +99,12 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
     }
 
     private final String generateCode() {
-        String precode = Long.toHexString(Double.doubleToLongBits(Math.random()));
-        int randomStart = rnd.nextInt(precode.length());
-        return precode.substring(randomStart, randomStart + 6);
+        String preCode = "";
+        while (preCode.length() < 16) {
+            preCode = Long.toHexString(Double.doubleToLongBits(rnd.nextDouble()));
+        }
+        int randomStart = rnd.nextInt(8);
+        return preCode.substring(randomStart, randomStart + 6);
     }
 
     private final boolean checkSettingsMakeBooks() {
