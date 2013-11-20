@@ -15,23 +15,6 @@
  * You should have received a copy of the GNU General Public License along with RuleBooks.
  * If not, see http://www.gnu.org/licenses/gpl.html.
  */
-/*
- * This file is part of RuleBook.
- *
- * Copyright © 2013 Visual Illusions Entertainment
- *
- * RuleBook is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
- *
- * RuleBook is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with RuleBook.
- * If not, see http://www.gnu.org/licenses/gpl.html.
- */
 package net.visualillusionsent.rulebooks;
 
 import net.canarymod.Canary;
@@ -131,8 +114,13 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
     private final void scanBooks() {
         File book_dir = new File("config/RuleBooks/books/");
         if (book_dir.exists()) {
-            for (File book : book_dir.listFiles(bookFilter)) {
-                createBook(book.getName().replace(".book", ""));
+            if (book_dir.listFiles(bookFilter).length > 0) {
+                for (File book : book_dir.listFiles(bookFilter)) {
+                    createBook(book.getName().replace(".book", ""));
+                }
+            }
+            else {
+                createBook("RuleBook");
             }
         }
         else if (book_dir.mkdir()) {
