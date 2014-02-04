@@ -1,18 +1,18 @@
 /*
  * This file is part of RuleBooks.
  *
- * Copyright © 2013 Visual Illusions Entertainment
+ * Copyright © 2013-2014 Visual Illusions Entertainment
  *
  * RuleBooks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License,
  * or (at your option) any later version.
  *
- * RuleBooks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with RuleBooks.
+ * You should have received a copy of the GNU General Public License along with this program.
  * If not, see http://www.gnu.org/licenses/gpl.html.
  */
 package net.visualillusionsent.rulebooks;
@@ -29,9 +29,9 @@ import net.visualillusionsent.utils.PropertiesFile;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.logging.Logger;
 
 public class RuleBooks extends VisualIllusionsCanaryPlugin {
 
@@ -62,7 +62,7 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
             new RuleBooksCommandHandler(this);
         }
         catch (Exception ex) {
-            getLogman().logStacktrace("Failed to load RuleBooks due to an exception...", ex);
+            getLogman().error("Failed to load RuleBooks due to an exception...", ex);
             return false;
         }
         return true;
@@ -101,7 +101,7 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
             pluginCfg.getString("welcome.message", "&6Welcome to the Server. Please read the given rule book and confirm the rules before proceeding.");
             pluginCfg.save();
             scanBooks();
-            getLogman().logWarning("This plugin needs to be configured before use. A new Config has be generated in config/RuleBooks/settings.cfg");
+            getLogman().warn("This plugin needs to be configured before use. A new Config has be generated in config/RuleBooks/settings.cfg");
             return false;
         }
         else {
@@ -144,8 +144,9 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
         }
         Item iBook = Canary.factory().getItemFactory().newItem(ItemType.WrittenBook, 0, 1);
         int page = 0;
+        ArrayList<String> pages = new ArrayList<String>();
         while (bookcfg.containsKey("page" + page)) {
-            BookHelper.addPages(iBook, bookcfg.getString("page" + page).replace("\\n", "\n").replaceAll("(?i)&([0-9A-FK-OR])", "\u00A7$1"));
+            pages.add(bookcfg.getString("page" + page).replace("\\n", "\n").replaceAll("(?i)&([0-9A-FK-OR])", "\u00A7$1"));
             page++;
         }
         BookHelper.setTitle(iBook, bookcfg.getString("title"));
@@ -161,7 +162,7 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
         Item newRuleBook = $.books.get("rulebook").clone();
         BookHelper.setAuthor(newRuleBook, player.getName());
         if (generate) {
-            BookHelper.addPages(newRuleBook, "Command:\n/rulebooks confirm ".concat(code));
+            BookHelper.addPages(newRuleBook, "Command:\n/rulebook confirm ".concat(code));
         }
         return newRuleBook;
     }
@@ -193,11 +194,4 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
     static Item getBook(String book_name) {
         return $.books.get(book_name.toLowerCase());
     }
-
-    // VIMCPlugin
-    @Override
-    public final Logger getPluginLogger() {
-        return getLogman();
-    }
-    //
 }

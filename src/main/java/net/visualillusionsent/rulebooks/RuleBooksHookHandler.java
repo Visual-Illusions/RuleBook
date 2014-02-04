@@ -1,18 +1,18 @@
 /*
  * This file is part of RuleBooks.
  *
- * Copyright © 2013 Visual Illusions Entertainment
+ * Copyright © 2013-2014 Visual Illusions Entertainment
  *
  * RuleBooks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License,
  * or (at your option) any later version.
  *
- * RuleBooks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with RuleBooks.
+ * You should have received a copy of the GNU General Public License along with this program.
  * If not, see http://www.gnu.org/licenses/gpl.html.
  */
 package net.visualillusionsent.rulebooks;
@@ -57,7 +57,7 @@ public final class RuleBooksHookHandler implements PluginListener {
 
     @HookHandler
     public final void connect(ConnectionHook hook) {
-        if (hook.isFirstConnection()) {
+        if (hook.isFirstConnection() && !hook.getPlayer().isInGroup(RuleBooks.getPromotionGroup(), true)) {
             Player player = hook.getPlayer();
             player.message(getWelcomeMessage());
             player.getInventory().addItem(getRuleBook(player, getCode(player, true), true));

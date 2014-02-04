@@ -1,18 +1,18 @@
 /*
  * This file is part of RuleBooks.
  *
- * Copyright © 2013 Visual Illusions Entertainment
+ * Copyright © 2013-2014 Visual Illusions Entertainment
  *
  * RuleBooks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License,
  * or (at your option) any later version.
  *
- * RuleBooks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with RuleBooks.
+ * You should have received a copy of the GNU General Public License along with this program.
  * If not, see http://www.gnu.org/licenses/gpl.html.
  */
 package net.visualillusionsent.rulebooks;
@@ -39,19 +39,23 @@ public class RuleBooksCommandHandler extends VisualIllusionsCanaryPluginInformat
         Canary.commands().registerCommands(this, rulebook, false);
     }
 
-    @Command(aliases = { "rulebooks" },
+    @Command(
+            aliases = { "rulebooks" },
             description = "RuleBooks plugin information",
             toolTip = "/rulebooks",
-            permissions = "/rulebooks")
+            permissions = "/rulebooks"
+    )
     public final void info(MessageReceiver msgrec, String[] args) {
         this.sendInformation(msgrec);
     }
 
 
-    @Command(aliases = { "rulebook" },
+    @Command(
+            aliases = { "rulebook" },
             description = "Gives the RuleBook for review",
             toolTip = "/rulebook",
-            permissions = { "" })
+            permissions = { "" }
+    )
     public final void rulebook(MessageReceiver msgrec, String[] args) {
         if (msgrec instanceof Player) {
             Player player = (Player) msgrec;
@@ -67,12 +71,14 @@ public class RuleBooksCommandHandler extends VisualIllusionsCanaryPluginInformat
         }
     }
 
-    @Command(aliases = { "confirm" },
+    @Command(
+            aliases = { "confirm" },
             parent = "rulebook",
             description = "Confirmation command that rule book has been read.",
             toolTip = "/rulebook confirm <code>",
             min = 2,
-            permissions = { "" })
+            permissions = { "" }
+    )
     public final void confirm(MessageReceiver msgrec, String[] args) {
         if (msgrec instanceof Player) {
             Player player = (Player) msgrec;
@@ -99,11 +105,13 @@ public class RuleBooksCommandHandler extends VisualIllusionsCanaryPluginInformat
         }
     }
 
-    @Command(aliases = { "get" },
+    @Command(
+            aliases = { "get" },
             parent = "rulebook",
             description = "Gives a book of the given name",
             toolTip = "/rulebook get <bookname>",
-            permissions = { "rulebooks.get" })
+            permissions = { "rulebooks.get" }
+    )
     public final void getABook(MessageReceiver msgrec, String[] args) {
         if (msgrec instanceof Player) {
             Item book = getBook(args[1]).clone();
