@@ -17,11 +17,17 @@
  */
 package net.visualillusionsent.rulebooks;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import net.canarymod.Canary;
+import net.canarymod.api.chat.ChatComponent;
+import net.canarymod.api.chat.ClickEvent;
 import net.canarymod.api.entity.living.humanoid.Player;
+import net.canarymod.api.factory.ChatComponentFactory;
 import net.canarymod.api.inventory.Item;
 import net.canarymod.api.inventory.ItemType;
 import net.canarymod.api.inventory.helper.BookHelper;
+import net.canarymod.api.world.position.Location;
 import net.canarymod.api.world.position.Vector3D;
 import net.canarymod.user.Group;
 import net.visualillusionsent.minecraft.plugin.canary.VisualIllusionsCanaryPlugin;
@@ -35,11 +41,12 @@ import java.util.Random;
 
 public class RuleBooks extends VisualIllusionsCanaryPlugin {
 
-    private final HashMap<String, Item> books = new HashMap<String, Item>();
+    private final HashMap<String, Item> books = Maps.newHashMap();
     private PropertiesFile pluginCfg;
     private Vector3D lockdown_location;
     private static RuleBooks $;
-    private static HashMap<String, String> codes = new HashMap<String, String>();
+    private static final ChatComponentFactory ccf = Canary.factory().getChatComponentFactory();
+    private static final HashMap<String, String> codes = Maps.newHashMap();
     private static final Random rnd = new Random();
     private static final FileFilter bookFilter = new FileFilter() {
         @Override
@@ -81,7 +88,7 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
         return codes.get(player.getName());
     }
 
-    private final String generateCode() {
+    private String generateCode() {
         String preCode = "";
         while (preCode.length() < 16) {
             preCode = Long.toHexString(Double.doubleToLongBits(rnd.nextDouble()));
@@ -90,12 +97,12 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
         return preCode.substring(randomStart, randomStart + 6);
     }
 
-    private final boolean checkSettingsMakeBooks() {
+    private boolean checkSettingsMakeBooks() {
         if (!new File("config/RuleBooks/settings.cfg").exists()) {
             pluginCfg = new PropertiesFile("config/RuleBooks/settings.cfg");
             pluginCfg.addHeaderLines("RuleBooks Plugin configuration file");
             pluginCfg.getBoolean("useLockdownArea", false);
-            pluginCfg.getString("lockdownLocation", "0,0,0");
+            pluginCfg.getString("lockdownLocation", getDefaultSpawn());
             pluginCfg.getInt("lockdownRadius", 150);
             pluginCfg.getString("promotionGroup", "players");
             pluginCfg.getString("welcome.message", "&6Welcome to the Server. Please read the given rule book and confirm the rules before proceeding.");
@@ -111,7 +118,7 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
         }
     }
 
-    private final void scanBooks() {
+    private void scanBooks() {
         File book_dir = new File("config/RuleBooks/books/");
         if (book_dir.exists()) {
             if (book_dir.listFiles(bookFilter).length > 0) {
@@ -131,7 +138,7 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
         }
     }
 
-    private final void createBook(String book) {
+    private void createBook(String book) {
         PropertiesFile bookcfg = new PropertiesFile("config/RuleBooks/books/" + book + ".book");
         if (!bookcfg.containsKey("title")) {
             bookcfg.addHeaderLines("Use \\n for new lines and &[color] for color and formatting codes", "You can add more pages by setting keys as page#=Some Text  (replacing # with the next page number)");
@@ -144,11 +151,12 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
         }
         Item iBook = Canary.factory().getItemFactory().newItem(ItemType.WrittenBook, 0, 1);
         int page = 0;
-        ArrayList<String> pages = new ArrayList<String>();
+        ArrayList<ChatComponent> pages = Lists.newArrayList();
         while (bookcfg.containsKey("page" + page)) {
-            pages.add(bookcfg.getString("page" + page).replace("\\n", "\n").replaceAll("(?i)&([0-9A-FK-OR])", "\u00A7$1"));
+            pages.add(ccf.newChatComponent(bookcfg.getString("page" + page).replace("\\n", "\n").replaceAll("(?i)&([0-9A-FK-OR])", "\u00A7$1")));
             page++;
         }
+        BookHelper.addPages(iBook, pages.toArray(new ChatComponent[pages.size()]));
         BookHelper.setTitle(iBook, bookcfg.getString("title"));
         iBook.getMetaTag().put("permission", "rulebooks.book.".concat(bookcfg.getString("permission", "")));
         books.put(book.toLowerCase(), iBook);
@@ -162,7 +170,11 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
         Item newRuleBook = $.books.get("rulebook").clone();
         BookHelper.setAuthor(newRuleBook, player.getName());
         if (generate) {
-            BookHelper.addPages(newRuleBook, "Command:\n/rulebook confirm ".concat(code));
+            ClickEvent cmdEvent = ccf.newClickEvent(ccf.getRunCommand(), "/rulebook confirm ".concat(code));
+            ChatComponent eventComponent = ccf.newChatComponent("Click here to confirm rules.");
+            eventComponent.getChatStyle().setChatClickEvent(cmdEvent);
+            eventComponent.getChatStyle().setColor(ccf.colorDarkGreen());
+            BookHelper.addPages(newRuleBook, eventComponent);
         }
         return newRuleBook;
     }
@@ -193,5 +205,10 @@ public class RuleBooks extends VisualIllusionsCanaryPlugin {
 
     static Item getBook(String book_name) {
         return $.books.get(book_name.toLowerCase());
+    }
+
+    static String getDefaultSpawn() {
+        Location spawn = Canary.getServer().getDefaultWorld().getSpawnLocation();
+        return String.format("%d,%d,%d", spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ());
     }
 }
